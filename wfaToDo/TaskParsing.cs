@@ -17,11 +17,11 @@ namespace wfaToDo
         public string? task { get; set; }
 
     }
-    internal class TaskParsing
+    internal static class TaskParsing
     {
         
 
-        public List<MyTask> Parse(string filePath)
+        public static List<MyTask> Parse(string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -34,11 +34,11 @@ namespace wfaToDo
 
             return tasks;
         }
-        public void AddTask(string filePath, int rang, bool status, string data, string task)
+        public static int AddTask(string filePath, int rang, bool status, string data, string task)
         {
             if (!File.Exists(filePath))
             {
-                File.WriteAllText(filePath, "[]"); // Создаем файл с пустым массивом JSON
+                File.WriteAllText(filePath, "[]");
             }
 
             string json = File.ReadAllText(filePath);
@@ -59,8 +59,62 @@ namespace wfaToDo
             tasks.Add(newTask);
 
             string updatedJson = JsonConvert.SerializeObject(tasks, Formatting.Indented);
-
             File.WriteAllText(filePath, updatedJson);
+
+            return newId;
+        }
+
+        public static void DeleteTask(string filePath, int taskId)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("Файл не найден", filePath);
+            }
+
+            string json = File.ReadAllText(filePath);
+
+            List<MyTask> tasks = JsonConvert.DeserializeObject<List<MyTask>>(json) ?? new List<MyTask>();
+
+            MyTask? taskToRemove = tasks.FirstOrDefault(t => t.ID == taskId);
+
+            if (taskToRemove != null)
+            {
+                tasks.Remove(taskToRemove);
+                string updatedJson = JsonConvert.SerializeObject(tasks, Formatting.Indented);
+                File.WriteAllText(filePath, updatedJson);
+            }
+            else
+            {
+                throw new ArgumentException($"Задача с ID {taskId} не найдена.");
+            }
+        }
+
+        public static void UpdateTask(string filePath, int taskId, int number, bool status, string data, string task)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("Файл не найден", filePath);
+            }
+
+            string json = File.ReadAllText(filePath);
+            List<MyTask> tasks = JsonConvert.DeserializeObject<List<MyTask>>(json) ?? new List<MyTask>();
+            MyTask? taskToUpdate = tasks.FirstOrDefault(t => t.ID == taskId);
+
+            if (taskToUpdate != null)
+            {
+                taskToUpdate.rang = number;
+                taskToUpdate.status = status;
+                taskToUpdate.data = data;
+                taskToUpdate.task = task;
+
+                string updatedJson = JsonConvert.SerializeObject(tasks, Formatting.Indented);
+
+                File.WriteAllText(filePath, updatedJson);
+            }
+            else
+            {
+                throw new ArgumentException($"Задача с ID {taskId} не найдена.");
+            }
         }
     }
 }
