@@ -31,13 +31,14 @@
             button1 = new Button();
             button2 = new Button();
             label1 = new Label();
+            button3 = new Button();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(12, 133);
+            button1.Location = new Point(12, 98);
             button1.Name = "button1";
-            button1.Size = new Size(242, 29);
+            button1.Size = new Size(445, 29);
             button1.TabIndex = 0;
             button1.Text = "Авторизироваться";
             button1.UseVisualStyleBackColor = true;
@@ -47,7 +48,7 @@
             // 
             button2.Location = new Point(12, 168);
             button2.Name = "button2";
-            button2.Size = new Size(242, 30);
+            button2.Size = new Size(445, 30);
             button2.TabIndex = 1;
             button2.Text = "Продолжить без авторизации";
             button2.UseVisualStyleBackColor = true;
@@ -64,11 +65,22 @@
             label1.Text = "Потребуется авторизация на Яндекс.Диск.";
             label1.TextAlign = ContentAlignment.TopCenter;
             // 
+            // button3
+            // 
+            button3.Location = new Point(12, 133);
+            button3.Name = "button3";
+            button3.Size = new Size(445, 29);
+            button3.TabIndex = 3;
+            button3.Text = "Авторизироваться и загрузить локальные изменения";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
             // Synk
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(469, 211);
+            Controls.Add(button3);
             Controls.Add(label1);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -83,5 +95,6 @@
         private Button button1;
         private Button button2;
         private Label label1;
+        private Button button3;
     }
 }

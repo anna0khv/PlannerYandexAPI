@@ -18,85 +18,108 @@ namespace wfaToDo
         private DataGridView[] grids = new DataGridView[4];
         private Label[] labels = new Label[4];
         TaskParsing tp = new TaskParsing();
-        public string ?userName = "";
+        public string? userName = "";
 
 
-        private async void button1_Click(object sender, EventArgs e)
-        {
-            Synk s = new Synk();
-            using (var form = new Synk()) // Замените YourForm на имя вашей формы
-            {
-                if (form.ShowDialog() == DialogResult.OK)
-                {
-                    // Получаем имя пользователя из формы
-                    string userName = form.name;
-                    lblName.Text = userName;
-                    lblName.Invalidate();
-                    lblName.Visible = true;
-                    label1.Visible = true;
-                }
-                else
-                {
-                    MessageBox.Show("Операция отменена.");
-                }
-            }
-            {
-                //APIYandex? yandexApi = new APIYandex();
-                //string authCode = await yandexApi.GetAuthCodeAsync();
+        //private async void button1_Click(object sender, EventArgs e)
+        //{
+        //    Synk s = new Synk();
+        //    using (var form = new Synk()) // Замените YourForm на имя вашей формы
+        //    {
+        //        if (form.ShowDialog() == DialogResult.OK)
+        //        {
+        //            // Получаем имя пользователя из формы
+        //            string userName = form.name;
+        //            lblName.Text = userName;
+        //            lblName.Invalidate();
+        //            lblName.Visible = true;
+        //            label1.Visible = true;
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("Операция отменена.");
+        //        }
+        //    }
+        //    {
+        //        //APIYandex? yandexApi = new APIYandex();
+        //        //string authCode = await yandexApi.GetAuthCodeAsync();
 
-                //if (authCode != null)
-                //{
-                //    MessageBox.Show("Авторизация успешна! Код: " + authCode);
+        //        //if (authCode != null)
+        //        //{
+        //        //    MessageBox.Show("Авторизация успешна! Код: " + authCode);
 
-                //    string token = await yandexApi.GetOAuthToken(authCode);
-                //    MessageBox.Show("Токен получен: " + token);
+        //        //    string token = await yandexApi.GetOAuthToken(authCode);
+        //        //    MessageBox.Show("Токен получен: " + token);
 
 
-                //    await yandexApi.CreateFolderAsync(token, "___for_planner___");
+        //        //    await yandexApi.CreateFolderAsync(token, "___for_planner___");
 
-                //    string localFilePath = @"C:\___for_planner___\file.txt";
-                //    string remoteFilePath = "___for_planner___/file.txt";
+        //        //    string localFilePath = @"C:\___for_planner___\file.txt";
+        //        //    string remoteFilePath = "___for_planner___/file.txt";
 
-                //    if (System.IO.File.Exists(localFilePath))
-                //    {
-                //        MessageBox.Show("Локальный файл найден: " + localFilePath);
-                //        await yandexApi.UploadFileAsync(token, localFilePath, remoteFilePath);
+        //        //    if (System.IO.File.Exists(localFilePath))
+        //        //    {
+        //        //        MessageBox.Show("Локальный файл найден: " + localFilePath);
+        //        //        await yandexApi.UploadFileAsync(token, localFilePath, remoteFilePath);
 
-                //    }
-                //    else
-                //    {
-                //        MessageBox.Show("Локальный файл не найден: " + localFilePath);
-                //    }
-                //}
-                //else
-                //{
-                //    MessageBox.Show("Ошибка авторизации.");
-                //}
-            }
-        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        MessageBox.Show("Локальный файл не найден: " + localFilePath);
+        //        //    }
+        //        //}
+        //        //else
+        //        //{
+        //        //    MessageBox.Show("Ошибка авторизации.");
+        //        //}
+        //    }
+        //}
         private void MainForm_Load(object sender, EventArgs e)
         {
+            cbxIsSync.Checked = true;
+            UpdateGridsLayout();
+        }
+        private void cbxIsSync_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbxIsSync.Checked)
+            {
+                startSync();
+            }
+            else
+            {
+                endSync();
+            }
+        }
+
+        private void startSync()
+        {
+            // Авторизация, скачивание с диска, получение имени пользователя
+
             Synk s = new Synk();
-            using (var form = new Synk()) // Замените YourForm на имя вашей формы
+            using (var form = new Synk())
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    // Получаем имя пользователя из формы
                     string userName = form.name;
                     lblName.Text = userName;
                     lblName.Invalidate();
                     lblName.Visible = true;
                     label1.Visible = true;
                     cbxIsSync.Checked = true;
+                    btnChangeUser.Visible = true;
                 }
                 else
                 {
                     MessageBox.Show("Операция отменена.");
                 }
             }
-            UpdateGridsLayout();
         }
-
+        private void endSync()
+        {
+            lblName.Visible = false;
+            label1.Visible = false;
+            btnChangeUser.Visible = false;
+        }
         private void MainForm_Resize(object sender, EventArgs e)
         {
             UpdateGridsLayout();
@@ -132,7 +155,7 @@ namespace wfaToDo
                     if (grids[counter] == null)
                     {
                         labels[counter] = new Label();
-                        labels[counter].Width = 150;
+                        labels[counter].Width = gridWidth / 2;
 
                         grids[counter] = new DataGridView();
                         //grids[counter]
@@ -180,6 +203,11 @@ namespace wfaToDo
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnChangeUser_Click(object sender, EventArgs e)
+        {
+            startSync();
         }
     }
 }
