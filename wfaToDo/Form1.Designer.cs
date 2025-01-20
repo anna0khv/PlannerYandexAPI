@@ -28,32 +28,40 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
-            checkBox1 = new CheckBox();
+            cbxIsSync = new CheckBox();
+            label1 = new Label();
+            lblName = new Label();
             SuspendLayout();
             // 
-            // button1
+            // cbxIsSync
             // 
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(12, 12);
-            button1.Name = "button1";
-            button1.Size = new Size(155, 29);
-            button1.TabIndex = 0;
-            button1.Text = "Синхронизировать";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            cbxIsSync.AutoSize = true;
+            cbxIsSync.Location = new Point(12, 15);
+            cbxIsSync.Name = "cbxIsSync";
+            cbxIsSync.Size = new Size(142, 24);
+            cbxIsSync.TabIndex = 1;
+            cbxIsSync.Text = "Синхронизация";
+            cbxIsSync.UseVisualStyleBackColor = true;
             // 
-            // checkBox1
+            // label1
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Checked = true;
-            checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(173, 12);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(142, 24);
-            checkBox1.TabIndex = 1;
-            checkBox1.Text = "Синхронизация";
-            checkBox1.UseVisualStyleBackColor = true;
+            label1.AutoSize = true;
+            label1.Location = new Point(397, 16);
+            label1.Name = "label1";
+            label1.Size = new Size(110, 20);
+            label1.TabIndex = 2;
+            label1.Text = "Пользователь:";
+            label1.Visible = false;
+            // 
+            // lblName
+            // 
+            lblName.AutoSize = true;
+            lblName.Location = new Point(503, 16);
+            lblName.Name = "lblName";
+            lblName.Size = new Size(50, 20);
+            lblName.TabIndex = 3;
+            lblName.Text = "label2";
+            lblName.Visible = false;
             // 
             // Form1
             // 
@@ -61,8 +69,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(800, 450);
-            Controls.Add(checkBox1);
-            Controls.Add(button1);
+            Controls.Add(lblName);
+            Controls.Add(label1);
+            Controls.Add(cbxIsSync);
             Name = "Form1";
             Text = "Мой Планнер";
             Load += Form1_Load;
@@ -71,8 +80,8 @@
         }
 
         #endregion
-
-        private Button button1;
-        private CheckBox checkBox1;
+        private CheckBox cbxIsSync;
+        private Label label1;
+        private Label lblName;
     }
 }

@@ -1,5 +1,6 @@
 
 using System.Diagnostics.Metrics;
+using System.Windows.Forms;
 
 namespace wfaToDo
 {
@@ -17,12 +18,28 @@ namespace wfaToDo
         private DataGridView[] grids = new DataGridView[4];
         private Label[] labels = new Label[4];
         TaskParsing tp = new TaskParsing();
+        public string ?userName = "";
 
 
         private async void button1_Click(object sender, EventArgs e)
         {
             Synk s = new Synk();
-            s.ShowDialog();
+            using (var form = new Synk()) // Замените YourForm на имя вашей формы
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Получаем имя пользователя из формы
+                    string userName = form.name;
+                    lblName.Text = userName;
+                    lblName.Invalidate();
+                    lblName.Visible = true;
+                    label1.Visible = true;
+                }
+                else
+                {
+                    MessageBox.Show("Операция отменена.");
+                }
+            }
             {
                 //APIYandex? yandexApi = new APIYandex();
                 //string authCode = await yandexApi.GetAuthCodeAsync();
@@ -59,7 +76,24 @@ namespace wfaToDo
         }
         private void MainForm_Load(object sender, EventArgs e)
         {
-
+            Synk s = new Synk();
+            using (var form = new Synk()) // Замените YourForm на имя вашей формы
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Получаем имя пользователя из формы
+                    string userName = form.name;
+                    lblName.Text = userName;
+                    lblName.Invalidate();
+                    lblName.Visible = true;
+                    label1.Visible = true;
+                    cbxIsSync.Checked = true;
+                }
+                else
+                {
+                    MessageBox.Show("Операция отменена.");
+                }
+            }
             UpdateGridsLayout();
         }
 

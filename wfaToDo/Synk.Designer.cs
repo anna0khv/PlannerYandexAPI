@@ -37,9 +37,9 @@
             // 
             button1.Location = new Point(12, 133);
             button1.Name = "button1";
-            button1.Size = new Size(199, 29);
+            button1.Size = new Size(242, 29);
             button1.TabIndex = 0;
-            button1.Text = "Загрузить с диска";
+            button1.Text = "Авторизироваться";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
@@ -47,16 +47,16 @@
             // 
             button2.Location = new Point(12, 168);
             button2.Name = "button2";
-            button2.Size = new Size(199, 30);
+            button2.Size = new Size(242, 30);
             button2.TabIndex = 1;
-            button2.Text = "Загрузить на диск";
+            button2.Text = "Продолжить без авторизации";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(20, 32);
+            label1.Location = new Point(40, 37);
             label1.MaximumSize = new Size(200, 0);
             label1.Name = "label1";
             label1.Size = new Size(191, 40);
