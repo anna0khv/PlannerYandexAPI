@@ -36,6 +36,7 @@
             // 
             // button1
             // 
+            button1.FlatStyle = FlatStyle.Flat;
             button1.Location = new Point(12, 98);
             button1.Name = "button1";
             button1.Size = new Size(445, 29);
@@ -46,6 +47,7 @@
             // 
             // button2
             // 
+            button2.FlatStyle = FlatStyle.Flat;
             button2.Location = new Point(12, 168);
             button2.Name = "button2";
             button2.Size = new Size(445, 30);
@@ -67,6 +69,7 @@
             // 
             // button3
             // 
+            button3.FlatStyle = FlatStyle.Flat;
             button3.Location = new Point(12, 133);
             button3.Name = "button3";
             button3.Size = new Size(445, 29);

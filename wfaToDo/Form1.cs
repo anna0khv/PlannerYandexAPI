@@ -19,6 +19,9 @@ namespace wfaToDo
         private Label[] labels = new Label[4];
         TaskParsing tp = new TaskParsing();
         public string? userName = "";
+        //private int isDone = 0;
+        private enum IS_DONE { ALL = 0, NOT_DONE, DONE };
+        IS_DONE isDone = IS_DONE.ALL;
 
 
         //private async void button1_Click(object sender, EventArgs e)
@@ -78,6 +81,7 @@ namespace wfaToDo
         {
             cbxIsSync.Checked = true;
             UpdateGridsLayout();
+            comboBox1.SelectedIndex = 0;
         }
         private void cbxIsSync_CheckedChanged(object sender, EventArgs e)
         {
@@ -131,15 +135,15 @@ namespace wfaToDo
             List<MyTask> tasks = tp.Parse(@"C:\___for_planner___\" + $"{number}.json");
             foreach (MyTask task in tasks)
             {
-                grids[number].Rows.Add(task.data, task.task, task.status);
+                if (isDone == IS_DONE.ALL 
+                    || (isDone == IS_DONE.NOT_DONE && task.status == false)
+                    || (isDone == IS_DONE.DONE && task.status == true))
+                    grids[number].Rows.Add(task.data, task.task, task.status);
             }
         }
         private void UpdateGridsLayout()
         {
-            //string filePath = @"C:\___for_planner___\lol.json";
-            //tp.AddTask(filePath, 0, true, "01.01.2000", "Ничего не делать");
-
-
+            
             int formWidth = this.ClientSize.Width;
             int formHeight = this.ClientSize.Height;
 
@@ -208,6 +212,15 @@ namespace wfaToDo
         private void btnChangeUser_Click(object sender, EventArgs e)
         {
             startSync();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            isDone = (IS_DONE)comboBox1.SelectedIndex;
+
+            for (int i = 0; i < 4; i++)  
+                FillGrids(i);
+            
         }
     }
 }
