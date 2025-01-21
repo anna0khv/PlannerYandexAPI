@@ -85,7 +85,8 @@ namespace wfaToDo
             }
             else
             {
-                throw new ArgumentException($"Задача с ID {taskId} не найдена.");
+                //throw new ArgumentException($"Задача с ID {taskId} не найдена.");
+                MessageBox.Show($"Задача с ID {taskId} не найдена для удаления.");
             }
         }
 

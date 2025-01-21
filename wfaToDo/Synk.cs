@@ -18,7 +18,7 @@ namespace wfaToDo
             InitializeComponent();
         }
 
-        public string localFilePath = @"C:\___for_planner___\";
+        public string localFilePath = @"..\..\..\___for_planner___\";
         public string remoteFilePath = "___for_planner___/";
         public string? name = "";
 

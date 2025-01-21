@@ -1,8 +1,11 @@
 
 using System;
 using System.Diagnostics.Metrics;
+using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static wfaToDo.TaskParsing;
 
 namespace wfaToDo
@@ -20,12 +23,13 @@ namespace wfaToDo
 
         private DataGridView[] grids = new DataGridView[4];
         private Label[] labels = new Label[4];
-        private Button[] buttons = new Button[4];
+        private System.Windows.Forms.Button[] buttons = new System.Windows.Forms.Button[4];
         //TaskParsing tp = new TaskParsing();
         public string? userName = "";
         //private int isDone = 0;
         private enum IS_DONE { ALL = 0, NOT_DONE, DONE };
         IS_DONE isDone = IS_DONE.ALL;
+        public string myPath = @"..\..\..\___for_planner___\";
 
 
         //private async void button1_Click(object sender, EventArgs e)
@@ -136,7 +140,8 @@ namespace wfaToDo
         {
             grids[number].Rows.Clear();
 
-            List<MyTask> tasks = TaskParsing.Parse(@"C:\___for_planner___\" + $"{number}.json");
+            //List<MyTask> tasks = TaskParsing.Parse(@"C:\___for_planner___\" + $"{number}.json");
+            List<MyTask> tasks = TaskParsing.Parse(myPath + $"{number}.json");
 
             foreach (MyTask task in tasks)
             {
@@ -170,7 +175,7 @@ namespace wfaToDo
                         labels[counter].Width = gridWidth / 2;
 
                         grids[counter] = new DataGridView();
-                        buttons[counter] = new Button();
+                        buttons[counter] = new System.Windows.Forms.Button();
                         //grids[counter]
                         this.Controls.Add(grids[counter]);
                         this.Controls.Add(labels[counter]);
@@ -179,15 +184,34 @@ namespace wfaToDo
                         grids[counter].ColumnCount = 3;
                         DataGridViewCheckBoxColumn checkBoxColumn = new DataGridViewCheckBoxColumn();
                         checkBoxColumn.Name = "Статус";
+                        checkBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
                         grids[counter].Columns.Add(checkBoxColumn);
 
                         grids[counter].Columns[0].Name = "ID";
+                        
                         grids[counter].Columns[1].Name = "Дата";
+                        grids[counter].Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+
                         grids[counter].Columns[2].Name = "Задача";
                         grids[counter].AllowDrop = true;
 
+                        grids[counter].AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                        grids[counter].AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+                        grids[counter].AllowUserToOrderColumns = true;
+                        grids[counter].AllowUserToResizeColumns = true;
+
                         grids[counter].CellValueChanged += cellChange;
                         grids[counter].AllowUserToAddRows = false;
+                        grids[counter].RowHeadersVisible = false;
+                        grids[counter].Columns[0].Visible = false;
+                        //grids[counter].AllowDrop = true;
+
+                        
+                        // Подключаем события для перетаскивания
+                        grids[counter].MouseDown += dataGridView_MouseDown;
+                        grids[counter].DragEnter += dataGridView_DragEnter;
+                        grids[counter].DragDrop += dataGridView_DragDrop;
+                        grids[counter].AllowDrop = true; // Разрешаем перетаскивание
                         
                         buttons[counter].Text = "+";
                         buttons[counter].BringToFront();
@@ -240,10 +264,109 @@ namespace wfaToDo
                     counter++;
                 }
         }
+        private void dataGridView_MouseDown(object sender, MouseEventArgs e)
+        {
+            //if (e.Clicks > 1)
+            //{
+            //    Console.WriteLine("Двойной клик. Перетаскивание отменено.");
+            //    return;
+            //}
 
+            if (e.Button == MouseButtons.Right)
+            {
+                return;
+            }
+            var grid = sender as DataGridView;
+
+            var hitTest = grid.HitTest(e.X, e.Y);
+            if (hitTest.Type == DataGridViewHitTestType.Cell)
+            {
+                var row = grid.Rows[hitTest.RowIndex];
+
+                grid.DoDragDrop(row, DragDropEffects.Move);
+            }
+        }
+
+        private void dataGridView_DragEnter(object sender, DragEventArgs e)
+        {
+            // перетаскиваемый объект — это строка DataGridView
+            if (e.Data.GetDataPresent(typeof(DataGridViewRow)))
+            {
+                e.Effect = DragDropEffects.Move;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void dataGridView_DragDrop(object sender, DragEventArgs e)
+        {
+            var targetGrid = sender as DataGridView;
+
+            var row = e.Data.GetData(typeof(DataGridViewRow)) as DataGridViewRow;
+
+            if (row == null)
+            {
+                Console.WriteLine("Перетаскиваемая строка не найдена.");
+                return;
+            }
+
+            var sourceGrid = row.DataGridView;
+
+            if (sourceGrid == null)
+            {
+                Console.WriteLine("Исходный DataGridView не найден.");
+                return;
+            }
+
+            int sourceIndex = GetGridIndex(sourceGrid);
+            int targetIndex = GetGridIndex(targetGrid);
+
+            if (sourceIndex == -1 || targetIndex == -1)
+            {
+                Console.WriteLine("Исходный или целевой DataGridView не найден в массиве grids.");
+                return;
+            }
+
+            var newRow = (DataGridViewRow)targetGrid.RowTemplate.Clone();
+            newRow.CreateCells(targetGrid);
+            for (int i = 0; i < row.Cells.Count; i++)
+            {
+                newRow.Cells[i].Value = row.Cells[i].Value;
+            }
+
+            targetGrid.Rows.Add(newRow);
+
+            TaskParsing.AddTask(
+                myPath + $"{targetIndex}.json",
+                targetIndex,
+                newRow.Cells["Статус"].Value as bool? ?? false,
+                newRow.Cells["Дата"].Value?.ToString() ?? " ",
+                newRow.Cells["Задача"].Value?.ToString() ?? " "
+            );
+            FillGrids(targetIndex);
+
+            TaskParsing.DeleteTask(
+                myPath + $"{sourceIndex}.json",
+                (int)row.Cells[0].Value
+            );
+            FillGrids(sourceIndex);
+        }
+        private int GetGridIndex(DataGridView grid)
+        {
+            for (int i = 0; i < grids.Length; i++)
+            {
+                if (grids[i] == grid)
+                {
+                    return i;
+                }
+            }
+            return -1; // Если grid не найден
+        }
         private void btnAddRow(object sender, EventArgs e)
         {
-            int index = Array.IndexOf(buttons, (Button)sender);
+            int index = Array.IndexOf(buttons, (System.Windows.Forms.Button)sender);
             addRow(grids[index], null);
         }
         private void cellChange(object sender, DataGridViewCellEventArgs e)
@@ -272,7 +395,7 @@ namespace wfaToDo
 
             try
             {
-                TaskParsing.UpdateTask((@"C:\___for_planner___\" + $"{number}.json"), taskId, number, status, data, task);
+                TaskParsing.UpdateTask((myPath + $"{number}.json"), taskId, number, status, data, task);
             }
             catch (Exception ex)
             {
@@ -289,7 +412,7 @@ namespace wfaToDo
 
             try
             {
-                int newId = TaskParsing.AddTask((@"C:\___for_planner___\" + $"{index}.json"), index, status, data, task);
+                int newId = TaskParsing.AddTask((myPath + $"{index}.json"), index, status, data, task);
                 FillGrids(index);
             }
             catch (Exception ex)
@@ -322,7 +445,7 @@ namespace wfaToDo
 
             try
             {
-                TaskParsing.DeleteTask((@"C:\___for_planner___\" + $"{index}.json"), taskId);
+                TaskParsing.DeleteTask((myPath + $"{index}.json"), taskId);
                 FillGrids(index);
             }
             catch (Exception ex)
