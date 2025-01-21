@@ -321,6 +321,26 @@ namespace wfaToDo
             }
         }
 
+        public async Task LogoutAsync(string token)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("OAuth", token);
+
+                var response = await client.DeleteAsync("https://oauth.yandex.ru/revoke_token");
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Выход из аккаунта выполнен успешно.");
+                    isAuth = false; // Обновляем статус авторизации
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Ошибка при выходе из аккаунта: " + error);
+                }
+            }
+        }
+
         public class DiskInfo
         {
             public UserInfo user { get; set; }

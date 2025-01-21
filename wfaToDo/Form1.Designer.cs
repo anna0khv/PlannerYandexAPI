@@ -73,9 +73,9 @@
             // btnChangeUser
             // 
             btnChangeUser.FlatStyle = FlatStyle.Flat;
-            btnChangeUser.Location = new Point(473, 21);
+            btnChangeUser.Location = new Point(473, 15);
             btnChangeUser.Name = "btnChangeUser";
-            btnChangeUser.Size = new Size(209, 29);
+            btnChangeUser.Size = new Size(209, 35);
             btnChangeUser.TabIndex = 4;
             btnChangeUser.Text = "Сменить пользователя";
             btnChangeUser.UseVisualStyleBackColor = true;

@@ -31,6 +31,10 @@ namespace wfaToDo
         IS_DONE isDone = IS_DONE.ALL;
         public string myPath = @"..\..\..\___for_planner___\";
 
+        // параметры для яндекса
+        //string? authCode;
+        //string? token;
+
 
         //private async void button1_Click(object sender, EventArgs e)
         //{
@@ -90,7 +94,42 @@ namespace wfaToDo
             cbxIsSync.Checked = true;
             UpdateGridsLayout();
             comboBox1.SelectedIndex = 0;
+
+            // контекстное меню
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+            ToolStripMenuItem changeUserItem = new ToolStripMenuItem("Сменить аккаунт");
+            ToolStripMenuItem leftItem = new ToolStripMenuItem("Выйти из аккаунта");
+
+            changeUserItem.Click += (s, e) => 
+            {
+                startSync();
+            };
+            leftItem.Click += (s, e) => 
+            {
+                quitSync();
+            };
+
+            contextMenu.Items.Add(changeUserItem);
+            contextMenu.Items.Add(leftItem);
+
+            btnChangeUser.ContextMenuStrip = contextMenu;
+            
+            btnChangeUser.Click += (s, e) => {
+                contextMenu.Show(btnChangeUser, new System.Drawing.Point(0, btnChangeUser.Height));
+            };
         }
+
+        private void quitSync()
+        {
+            lblName.Visible = false;
+            label1.Visible = false;
+            cbxIsSync.Checked = false;
+            btnChangeUser.Visible = false;
+
+            // TODO: удаление токена
+            // APIYandex. logout
+        }
+
         private void cbxIsSync_CheckedChanged(object sender, EventArgs e)
         {
             if (cbxIsSync.Checked)
@@ -122,6 +161,7 @@ namespace wfaToDo
                 }
                 else
                 {
+                    cbxIsSync.Checked = false;
                     MessageBox.Show("Операция отменена.");
                 }
             }
@@ -461,7 +501,14 @@ namespace wfaToDo
 
         private void btnChangeUser_Click(object sender, EventArgs e)
         {
-            startSync();
+            //startSync();
+
+            
+        }
+
+        private void BtnChangeUser_Click(object? sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)

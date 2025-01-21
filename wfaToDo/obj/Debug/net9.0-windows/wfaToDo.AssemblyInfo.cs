@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("wfaToDo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18f2f67e80aac16ae53cf5e855fbf2fb2e240f0f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+daeb67c03859015caf9395ea8875c19146d84175")]
 [assembly: System.Reflection.AssemblyProductAttribute("wfaToDo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("wfaToDo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

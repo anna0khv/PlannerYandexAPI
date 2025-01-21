@@ -7,6 +7,20 @@
     "task": "Ничего не делать"
   },
   {
+    "ID": 2,
+    "rang": 3,
+    "status": false,
+    "data": "",
+    "task": ""
+  },
+  {
+    "ID": 3,
+    "rang": 3,
+    "status": false,
+    "data": "",
+    "task": ""
+  },
+  {
     "ID": 4,
     "rang": 3,
     "status": false,
@@ -29,20 +43,6 @@
   },
   {
     "ID": 7,
-    "rang": 3,
-    "status": false,
-    "data": "2025-01-21",
-    "task": "Новая задача"
-  },
-  {
-    "ID": 8,
-    "rang": 3,
-    "status": false,
-    "data": "2025-01-21",
-    "task": "Новая задача"
-  },
-  {
-    "ID": 9,
     "rang": 3,
     "status": false,
     "data": "2025-01-21",
