@@ -19,6 +19,42 @@ namespace wfaToDo
             InitializeComponent();
             Load += MainForm_Load;
             Resize += MainForm_Resize;
+            FormClosing += Form1_FormClosing;
+        }
+
+        private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            
+            if (APIYandex.isAuth)
+            {
+                APIYandex.isAuth = false;
+                APIYandex.StopSyncTimer();
+                e.Cancel = true;
+                using (var form = new Closing())
+                {
+                    form.Location = new Point(this.Width/2, this.Height/2);
+                    form.Show();
+                    this.Enabled = false;
+                    //await APIYandex.allUploadFileAsync(APIYandex.localFilePath, APIYandex.remoteFilePath);
+                    await APIYandex.CreateFolderAsync("___for_planner___");
+                    for (int i = 0; i < 4; i++)
+                    {
+                        string file = $"{i}.json";
+                        if (System.IO.File.Exists(APIYandex.localFilePath + file))
+                        {
+                            MessageBox.Show("Локальный файл найден: " + APIYandex.localFilePath + file);
+                            await APIYandex.UploadFileAsync(APIYandex.localFilePath + file, APIYandex.remoteFilePath + file);
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("Локальный файл не найден: " + APIYandex.localFilePath + file);
+                        }
+                        form.updateProgress(i);
+                    }
+                }
+                this.Close();
+            }
         }
 
         private DataGridView[] grids = new DataGridView[4];
@@ -31,64 +67,6 @@ namespace wfaToDo
         IS_DONE isDone = IS_DONE.ALL;
         public string myPath = @"..\..\..\___for_planner___\";
 
-        // параметры для яндекса
-        //string? authCode;
-        //string? token;
-
-
-        //private async void button1_Click(object sender, EventArgs e)
-        //{
-        //    Synk s = new Synk();
-        //    using (var form = new Synk()) // Замените YourForm на имя вашей формы
-        //    {
-        //        if (form.ShowDialog() == DialogResult.OK)
-        //        {
-        //            // Получаем имя пользователя из формы
-        //            string userName = form.name;
-        //            lblName.Text = userName;
-        //            lblName.Invalidate();
-        //            lblName.Visible = true;
-        //            label1.Visible = true;
-        //        }
-        //        else
-        //        {
-        //            MessageBox.Show("Операция отменена.");
-        //        }
-        //    }
-        //    {
-        //        //APIYandex? yandexApi = new APIYandex();
-        //        //string authCode = await yandexApi.GetAuthCodeAsync();
-
-        //        //if (authCode != null)
-        //        //{
-        //        //    MessageBox.Show("Авторизация успешна! Код: " + authCode);
-
-        //        //    string token = await yandexApi.GetOAuthToken(authCode);
-        //        //    MessageBox.Show("Токен получен: " + token);
-
-
-        //        //    await yandexApi.CreateFolderAsync(token, "___for_planner___");
-
-        //        //    string localFilePath = @"C:\___for_planner___\file.txt";
-        //        //    string remoteFilePath = "___for_planner___/file.txt";
-
-        //        //    if (System.IO.File.Exists(localFilePath))
-        //        //    {
-        //        //        MessageBox.Show("Локальный файл найден: " + localFilePath);
-        //        //        await yandexApi.UploadFileAsync(token, localFilePath, remoteFilePath);
-
-        //        //    }
-        //        //    else
-        //        //    {
-        //        //        MessageBox.Show("Локальный файл не найден: " + localFilePath);
-        //        //    }
-        //        //}
-        //        //else
-        //        //{
-        //        //    MessageBox.Show("Ошибка авторизации.");
-        //        //}
-        //    }
-        //}
         private void MainForm_Load(object sender, EventArgs e)
         {
             cbxIsSync.Checked = true;
@@ -102,6 +80,7 @@ namespace wfaToDo
 
             changeUserItem.Click += (s, e) => 
             {
+                quitSync();
                 startSync();
             };
             leftItem.Click += (s, e) => 
@@ -125,20 +104,30 @@ namespace wfaToDo
             label1.Visible = false;
             cbxIsSync.Checked = false;
             btnChangeUser.Visible = false;
-
-            // TODO: удаление токена
-            // APIYandex. logout
+            APIYandex.LogoutAsync();
         }
 
         private void cbxIsSync_CheckedChanged(object sender, EventArgs e)
         {
             if (cbxIsSync.Checked)
             {
-                startSync();
+                if (APIYandex.token == null) // был сброс
+                    startSync();
+                else  // не было сброса
+                {
+                    APIYandex.StartSyncTimer(APIYandex.localFilePath, APIYandex.remoteFilePath);
+                    lblName.Visible = true;
+                    label1.Visible = true;
+                    btnChangeUser.Visible = true;
+                }
             }
             else
             {
-                endSync();
+                //endSync();
+                lblName.Visible = false;
+                label1.Visible = false;
+                btnChangeUser.Visible = false;
+                APIYandex.StopSyncTimer();
             }
         }
 
@@ -158,6 +147,8 @@ namespace wfaToDo
                     label1.Visible = true;
                     cbxIsSync.Checked = true;
                     btnChangeUser.Visible = true;
+                    //authCode = form.authCode;
+                    //APIYandex.authCode = form.authCode;
                 }
                 else
                 {
@@ -168,6 +159,8 @@ namespace wfaToDo
         }
         private void endSync()
         {
+            APIYandex.LogoutAsync();
+            //APIYandex.isAuth = false;
             lblName.Visible = false;
             label1.Visible = false;
             btnChangeUser.Visible = false;
@@ -255,8 +248,10 @@ namespace wfaToDo
                         
                         buttons[counter].Text = "+";
                         buttons[counter].BringToFront();
-                        buttons[counter].BackColor = Color.Blue;
+                        buttons[counter].BackColor = Color.LightBlue;
                         buttons[counter].FlatStyle = FlatStyle.Flat;
+                        buttons[counter].Font = new Font("Ubuntu", 9);
+                        buttons[counter].TextAlign = ContentAlignment.MiddleCenter;
                         buttons[counter].Click += btnAddRow;
                         buttons[counter].Size = new Size(btnSize, btnSize);
 
@@ -306,11 +301,11 @@ namespace wfaToDo
         }
         private void dataGridView_MouseDown(object sender, MouseEventArgs e)
         {
-            //if (e.Clicks > 1)
-            //{
-            //    Console.WriteLine("Двойной клик. Перетаскивание отменено.");
-            //    return;
-            //}
+            if (e.Clicks <= 1)
+            {
+                //  MessageBox.Show("Двойной клик. Перетаскивание отменено.");
+                return;
+            }
 
             if (e.Button == MouseButtons.Right)
             {
@@ -348,7 +343,7 @@ namespace wfaToDo
 
             if (row == null)
             {
-                Console.WriteLine("Перетаскиваемая строка не найдена.");
+                //  MessageBox.Show("Перетаскиваемая строка не найдена.");
                 return;
             }
 
@@ -356,7 +351,7 @@ namespace wfaToDo
 
             if (sourceGrid == null)
             {
-                Console.WriteLine("Исходный DataGridView не найден.");
+                //  MessageBox.Show("Исходный DataGridView не найден.");
                 return;
             }
 
@@ -365,7 +360,7 @@ namespace wfaToDo
 
             if (sourceIndex == -1 || targetIndex == -1)
             {
-                Console.WriteLine("Исходный или целевой DataGridView не найден в массиве grids.");
+                //  MessageBox.Show("Исходный или целевой DataGridView не найден в массиве grids.");
                 return;
             }
 

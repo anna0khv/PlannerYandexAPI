@@ -72,12 +72,13 @@
             // 
             // btnChangeUser
             // 
+            btnChangeUser.BackgroundImage = Properties.Resources.user_icon;
+            btnChangeUser.BackgroundImageLayout = ImageLayout.Zoom;
             btnChangeUser.FlatStyle = FlatStyle.Flat;
-            btnChangeUser.Location = new Point(473, 15);
+            btnChangeUser.Location = new Point(640, 9);
             btnChangeUser.Name = "btnChangeUser";
-            btnChangeUser.Size = new Size(209, 35);
+            btnChangeUser.Size = new Size(42, 40);
             btnChangeUser.TabIndex = 4;
-            btnChangeUser.Text = "Сменить пользователя";
             btnChangeUser.UseVisualStyleBackColor = true;
             btnChangeUser.Visible = false;
             btnChangeUser.Click += btnChangeUser_Click;

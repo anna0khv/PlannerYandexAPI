@@ -4,16 +4,23 @@ using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using static wfaToDo.Form1;
+using System.Threading;
 namespace wfaToDo
 {
-    internal class APIYandex
+
+    internal static class APIYandex
     {
-        public bool isAuth = false;
+        public static bool isAuth = false;
         private static string clientId = "199d556fdb27498b983479350480f64d";
         private static string redirectUri = "http://localhost:12345/auth";
-        private string authUrl = $"https://oauth.yandex.ru/authorize?response_type=code&client_id={clientId}&redirect_uri={redirectUri}";
-        private string clientSecret = "07800a989ab4485d9445ccfd0d2f0850";
-        public APIYandex() { }
+        //private static string authUrl = $"https://oauth.yandex.ru/authorize?response_type=code&client_id={clientId}&redirect_uri={redirectUri}";
+        private static string authUrl = $"https://oauth.yandex.ru/authorize?response_type=code&client_id={clientId}&force_confirm=true&{redirectUri}";
+        private static string clientSecret = "07800a989ab4485d9445ccfd0d2f0850";
+        public static string  authCode = "";
+        public static string token = null;
+        public static string localFilePath = @"..\..\..\___for_planner___\";
+        public static string remoteFilePath = "___for_planner___/";
+        //public APIYandex() { }
 
         public class TokenResponse
         {
@@ -24,32 +31,21 @@ namespace wfaToDo
             public string scope { get; set; }
         }
 
-        public bool Auth()
+        private static System.Threading.Timer syncTimer;
+
+        public static void StartSyncTimer(string localFolderPath, string remoteFolderPath)
         {
-            if (!isAuth)
-            {
-                try
-                {
-                    var processStartInfo = new ProcessStartInfo
-                    {
-                        FileName = authUrl,
-                        UseShellExecute = true
-                    };
-                    Process.Start(processStartInfo);
-
-                    isAuth = true;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Ошибка при авторизации: {ex.Message}");
-                    isAuth = false;
-                }
-            }
-
-            return isAuth;
+            syncTimer = new System.Threading.Timer(async _ => 
+            await allUploadFileAsync(localFolderPath, remoteFolderPath), 
+            null, 300000, 300000);  // 2 мин
         }
 
-        public async Task<string> GetAuthCodeAsync()
+        public static void StopSyncTimer()
+        {
+            syncTimer?.Change(Timeout.Infinite, 0);
+        }
+
+        public static async Task<string> GetAuthCodeAsync()
         {
             if (!isAuth)
             {
@@ -68,7 +64,7 @@ namespace wfaToDo
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Ошибка при авторизации: {ex.Message}");
+                    //  MessageBox.Show($"Ошибка при авторизации: {ex.Message}");
                     isAuth = false;
                     return null;
                 }
@@ -76,14 +72,14 @@ namespace wfaToDo
             return null;
         }
 
-        private async Task<string> WaitForAuthCodeAsync()
+        private static async Task<string> WaitForAuthCodeAsync()
         {
             using (var listener = new HttpListener())
             {
                 listener.Prefixes.Add(redirectUri + "/");
                 listener.Start();
 
-                Console.WriteLine("Ожидание авторизации...");
+                //  MessageBox.Show("Ожидание авторизации...");
 
                 var context = await listener.GetContextAsync();
                 var request = context.Request;
@@ -101,7 +97,7 @@ namespace wfaToDo
                 return authCode;
             }
         }
-        public async Task<string> GetOAuthToken(string code)
+        public static async Task<string> GetOAuthToken()
         {
 
             using (HttpClient client = new HttpClient())
@@ -109,7 +105,7 @@ namespace wfaToDo
                 var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("code", code),
+                    new KeyValuePair<string, string>("code", authCode),
                     new KeyValuePair<string, string>("client_id", clientId),
                     new KeyValuePair<string, string>("client_secret", clientSecret),
                     new KeyValuePair<string, string>("redirect_uri", redirectUri)
@@ -122,18 +118,19 @@ namespace wfaToDo
                 {
                     // Десериализация json
                     TokenResponse tokenData = JsonConvert.DeserializeObject<TokenResponse>(responseString);
-
+                    isAuth = true;
+                    StartSyncTimer(localFilePath, remoteFilePath);
                     return tokenData.access_token;
                 }
                 else
                 {
                     string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Ошибка при получении токена: " + error);
+                    //  MessageBox.Show("Ошибка при получении токена: " + error);
                     return null;
                 }
             }
         }
-        public async Task CreateFolderAsync(string token, string folderPath)
+        public static async Task CreateFolderAsync(string folderPath)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -147,15 +144,33 @@ namespace wfaToDo
                 }
             }
         }
+        public static async Task<bool> allUploadFileAsync(string localFilePath, string remoteFilePath)
+        {
+            await APIYandex.CreateFolderAsync("___for_planner___");
+            for (int i = 0; i < 4; i++)
+            {
+                string file = $"{i}.json";
+                if (System.IO.File.Exists(localFilePath + file))
+                {
+                    MessageBox.Show("Локальный файл найден: " + localFilePath + file);
+                    await APIYandex.UploadFileAsync(localFilePath + file, remoteFilePath + file);
 
-        public async Task<bool> UploadFileAsync(string token, string localFilePath, string remoteFilePath)
+                }
+                else
+                {
+                    MessageBox.Show("Локальный файл не найден: " + localFilePath + file);
+                }
+            }
+            return true;
+        }
+        public static async Task<bool> UploadFileAsync(string localFilePath, string remoteFilePath)
         {
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("OAuth", token);
 
                 // Удаляем существующий файл
-                await DeleteFileAsync(token, remoteFilePath);
+                await DeleteFileAsync(remoteFilePath);
 
                 // Получаем ссылку для загрузки
                 var response = await client.GetAsync($"https://cloud-api.yandex.net/v1/disk/resources/upload?path={Uri.EscapeDataString(remoteFilePath)}");
@@ -169,13 +184,13 @@ namespace wfaToDo
                         var uploadResponse = await client.PutAsync(uploadUrl, fileContent);
                         if (uploadResponse.IsSuccessStatusCode)
                         {
-                            Console.WriteLine("Файл загружен: " + remoteFilePath);
+                            //  MessageBox.Show("Файл загружен: " + remoteFilePath);
                             return true; // Успешно
                         }
                         else
                         {
                             string error = await uploadResponse.Content.ReadAsStringAsync();
-                            Console.WriteLine("Ошибка при загрузке файла: " + error);
+                            //  MessageBox.Show("Ошибка при загрузке файла: " + error);
                             return false; // Ошибка
                         }
                     }
@@ -183,7 +198,7 @@ namespace wfaToDo
                 else
                 {
                     string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Ошибка при получении ссылки для загрузки: " + error);
+                    //  MessageBox.Show("Ошибка при получении ссылки для загрузки: " + error);
                     return false; // Ошибка
                 }
             }
@@ -196,7 +211,7 @@ namespace wfaToDo
             public bool templated { get; set; }
         }
 
-        public async Task DownloadFileAsync(string token, string remoteFilePath, string localFilePath)
+        public static async Task DownloadFileAsync(string remoteFilePath, string localFilePath)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -215,18 +230,18 @@ namespace wfaToDo
                         {
                             await fileResponse.Content.CopyToAsync(fileStream);
                         }
-                        Console.WriteLine("Файл скачан: " + localFilePath);
+                        //  MessageBox.Show("Файл скачан: " + localFilePath);
                     }
                     else
                     {
                         string error = await fileResponse.Content.ReadAsStringAsync();
-                        Console.WriteLine("Ошибка при скачивании файла: " + error);
+                        //  MessageBox.Show("Ошибка при скачивании файла: " + error);
                     }
                 }
                 else
                 {
                     string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Ошибка при получении ссылки для скачивания: " + error);
+                    //  MessageBox.Show("Ошибка при получении ссылки для скачивания: " + error);
                 }
             }
         }
@@ -238,26 +253,26 @@ namespace wfaToDo
             public bool templated { get; set; }
         }
 
-        public async Task SyncFolderWithYandexDisk(string token, string localFolderPath, string remoteFolderPath)
-        {
-            // not used
-            MessageBox.Show("Перед папкой");
-            await CreateFolderAsync(token, remoteFolderPath);
-            MessageBox.Show("После папкой");
-            foreach (var file in System.IO.Directory.GetFiles(localFolderPath))
-            {
-                string remoteFilePath = $"{remoteFolderPath}/{System.IO.Path.GetFileName(file)}";
-                await UploadFileAsync(token, file, remoteFilePath);
-            }
-            var remoteFiles = await ListFilesAsync(token, remoteFolderPath);
-            foreach (var remoteFile in remoteFiles)
-            {
-                string localFilePath = System.IO.Path.Combine(localFolderPath, System.IO.Path.GetFileName(remoteFile));
-                await DownloadFileAsync(token, remoteFile, localFilePath);
-            }
-        }
+        //public static async Task SyncFolderWithYandexDisk(string localFolderPath, string remoteFolderPath)
+        //{
+        //    // not used
+        //    MessageBox.Show("Перед папкой");
+        //    await CreateFolderAsync(remoteFolderPath);
+        //    MessageBox.Show("После папкой");
+        //    foreach (var file in System.IO.Directory.GetFiles(localFolderPath))
+        //    {
+        //        string remoteFilePath = $"{remoteFolderPath}/{System.IO.Path.GetFileName(file)}";
+        //        await UploadFileAsync(file, remoteFilePath);
+        //    }
+        //    var remoteFiles = await ListFilesAsync(remoteFolderPath);
+        //    foreach (var remoteFile in remoteFiles)
+        //    {
+        //        string localFilePath = System.IO.Path.Combine(localFolderPath, System.IO.Path.GetFileName(remoteFile));
+        //        await DownloadFileAsync(remoteFile, localFilePath);
+        //    }
+        //}
 
-        public async Task<List<string>> ListFilesAsync(string token, string remoteFolderPath)
+        public static async Task<List<string>> ListFilesAsync(string remoteFolderPath)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -279,7 +294,7 @@ namespace wfaToDo
             }
         }
 
-        public async Task<bool> DeleteFileAsync(string token, string remoteFilePath)
+        public static async Task<bool> DeleteFileAsync(string remoteFilePath)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -288,18 +303,18 @@ namespace wfaToDo
                 var response = await client.DeleteAsync($"https://cloud-api.yandex.net/v1/disk/resources?path={Uri.EscapeDataString(remoteFilePath)}");
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Файл удалён: " + remoteFilePath);
+                    //  MessageBox.Show("Файл удалён: " + remoteFilePath);
                     return true; // Успешно
                 }
                 else
                 {
                     string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Ошибка при удалении файла: " + error);
+                    //  MessageBox.Show("Ошибка при удалении файла: " + error);
                     return false; // Ошибка
                 }
             }
         }
-        public async Task<string> GetUserNameAsync(string token)
+        public static async Task<string> GetUserNameAsync()
         {
             using (HttpClient client = new HttpClient())
             {
@@ -315,30 +330,24 @@ namespace wfaToDo
                 else
                 {
                     string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Ошибка при получении информации о пользователе: " + error);
+                    //  MessageBox.Show("Ошибка при получении информации о пользователе: " + error);
                     return null;
                 }
             }
         }
 
-        public async Task LogoutAsync(string token)
+        public static async Task LogoutAsync()
         {
-            using (HttpClient client = new HttpClient())
+            
+            token = null;
+            //if (response.IsSuccessStatusCode)
+            if (token == null)
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("OAuth", token);
-
-                var response = await client.DeleteAsync("https://oauth.yandex.ru/revoke_token");
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("Выход из аккаунта выполнен успешно.");
-                    isAuth = false; // Обновляем статус авторизации
-                }
-                else
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Ошибка при выходе из аккаунта: " + error);
-                }
+                //  MessageBox.Show("Выход из аккаунта выполнен успешно.");
+                isAuth = false; // Обновляем статус авторизации
+                StopSyncTimer();
             }
+            
         }
 
         public class DiskInfo

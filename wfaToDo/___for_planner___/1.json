@@ -1,12 +1,5 @@
 [
   {
-    "ID": 1,
-    "rang": 1,
-    "status": true,
-    "data": "1.01.2000",
-    "task": "Ничего не делать"
-  },
-  {
     "ID": 2,
     "rang": 1,
     "status": false,
@@ -35,7 +28,7 @@
     "task": "Новаяesfsef задача"
   },
   {
-    "ID": 7,
+    "ID": 9,
     "rang": 1,
     "status": false,
     "data": "2025-01-21",

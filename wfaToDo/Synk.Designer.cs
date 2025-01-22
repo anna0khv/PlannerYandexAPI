@@ -59,13 +59,14 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(40, 37);
+            label1.Location = new Point(143, 35);
             label1.MaximumSize = new Size(200, 0);
             label1.Name = "label1";
             label1.Size = new Size(191, 40);
             label1.TabIndex = 2;
             label1.Text = "Потребуется авторизация на Яндекс.Диск.";
             label1.TextAlign = ContentAlignment.TopCenter;
+            label1.Click += label1_Click;
             // 
             // button3
             // 
