@@ -28,41 +28,86 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
-            checkBox1 = new CheckBox();
+            cbxIsSync = new CheckBox();
+            label1 = new Label();
+            lblName = new Label();
+            btnChangeUser = new Button();
+            comboBox1 = new ComboBox();
             SuspendLayout();
             // 
-            // button1
+            // cbxIsSync
             // 
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(12, 12);
-            button1.Name = "button1";
-            button1.Size = new Size(155, 29);
-            button1.TabIndex = 0;
-            button1.Text = "Синхронизировать";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            cbxIsSync.AutoSize = true;
+            cbxIsSync.BackColor = Color.White;
+            cbxIsSync.Location = new Point(15, 17);
+            cbxIsSync.Margin = new Padding(4, 3, 4, 3);
+            cbxIsSync.Name = "cbxIsSync";
+            cbxIsSync.Size = new Size(156, 27);
+            cbxIsSync.TabIndex = 1;
+            cbxIsSync.Text = "Синхронизация";
+            cbxIsSync.UseVisualStyleBackColor = false;
+            cbxIsSync.CheckedChanged += cbxIsSync_CheckedChanged;
             // 
-            // checkBox1
+            // label1
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Checked = true;
-            checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(173, 12);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(142, 24);
-            checkBox1.TabIndex = 1;
-            checkBox1.Text = "Синхронизация";
-            checkBox1.UseVisualStyleBackColor = true;
+            label1.AutoSize = true;
+            label1.Location = new Point(689, 21);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(128, 23);
+            label1.TabIndex = 2;
+            label1.Text = "Пользователь:";
+            label1.Visible = false;
+            // 
+            // lblName
+            // 
+            lblName.AutoSize = true;
+            lblName.Location = new Point(822, 21);
+            lblName.Margin = new Padding(4, 0, 4, 0);
+            lblName.Name = "lblName";
+            lblName.Size = new Size(56, 23);
+            lblName.TabIndex = 3;
+            lblName.Text = "label2";
+            lblName.Visible = false;
+            // 
+            // btnChangeUser
+            // 
+            btnChangeUser.BackgroundImage = Properties.Resources.user_icon;
+            btnChangeUser.BackgroundImageLayout = ImageLayout.Zoom;
+            btnChangeUser.FlatStyle = FlatStyle.Flat;
+            btnChangeUser.Location = new Point(640, 9);
+            btnChangeUser.Name = "btnChangeUser";
+            btnChangeUser.Size = new Size(42, 40);
+            btnChangeUser.TabIndex = 4;
+            btnChangeUser.UseVisualStyleBackColor = true;
+            btnChangeUser.Visible = false;
+            btnChangeUser.Click += btnChangeUser_Click;
+            // 
+            // comboBox1
+            // 
+            comboBox1.BackColor = SystemColors.ControlLight;
+            comboBox1.FlatStyle = FlatStyle.Flat;
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Items.AddRange(new object[] { "Все задачи", "Невыполненные", "Выполненные" });
+            comboBox1.Location = new Point(202, 17);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(151, 31);
+            comboBox1.TabIndex = 5;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(10F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(800, 450);
-            Controls.Add(checkBox1);
-            Controls.Add(button1);
+            ClientSize = new Size(1000, 518);
+            Controls.Add(comboBox1);
+            Controls.Add(btnChangeUser);
+            Controls.Add(lblName);
+            Controls.Add(label1);
+            Controls.Add(cbxIsSync);
+            Font = new Font("Sitka Small", 9F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            Margin = new Padding(4, 3, 4, 3);
             Name = "Form1";
             Text = "Мой Планнер";
             Load += Form1_Load;
@@ -71,8 +116,10 @@
         }
 
         #endregion
-
-        private Button button1;
-        private CheckBox checkBox1;
+        private CheckBox cbxIsSync;
+        private Label label1;
+        private Label lblName;
+        private Button btnChangeUser;
+        private ComboBox comboBox1;
     }
 }

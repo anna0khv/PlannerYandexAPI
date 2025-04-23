@@ -18,60 +18,113 @@ namespace wfaToDo
             InitializeComponent();
         }
 
-        public string localFilePath = @"C:\___for_planner___\";
+        public string localFilePath = @"..\..\..\___for_planner___\";
         public string remoteFilePath = "___for_planner___/";
+        public string? name = "";
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            // download from disk
+            this.Enabled = false;
+            APIYandex.authCode = await APIYandex.GetAuthCodeAsync();
 
-            APIYandex? yandexApi = new APIYandex();
-            string authCode = await yandexApi.GetAuthCodeAsync();
-
-            if (authCode != null)
+            if (APIYandex.authCode != null)
             {
-                MessageBox.Show("Авторизация успешна! Код: " + authCode);
+                MessageBox.Show("Авторизация успешна! Код: " + APIYandex.authCode);
 
-                string token = await yandexApi.GetOAuthToken(authCode);
-                MessageBox.Show("Токен получен: " + token);
+                APIYandex.token = await APIYandex.GetOAuthToken();
+                MessageBox.Show("Токен получен: " + APIYandex.token);
 
                 for (int i = 0; i < 4; i++)
                 {
                     string file = $"{i}.json";
-                    await yandexApi.DownloadFileAsync(token, remoteFilePath + file, localFilePath + file);
+                    await APIYandex.DownloadFileAsync(remoteFilePath + file, localFilePath + file);
                 }
-                
 
+                // Получаем имя пользователя
+                string userName = await APIYandex.GetUserNameAsync();
+                if (userName != null)
+                {
+                    this.name = userName;
+                    MessageBox.Show("Имя пользователя: " + userName);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось получить имя пользователя.");
+                }
+                this.DialogResult = DialogResult.OK;
             }
             else
             {
                 MessageBox.Show("Ошибка авторизации.");
+                this.DialogResult = DialogResult.Cancel;
             }
+
+            this.Close();
         }
 
         private async void button2_Click(object sender, EventArgs e)
         {
             // download from local 
-
-            APIYandex? yandexApi = new APIYandex();
-            string authCode = await yandexApi.GetAuthCodeAsync();
-
-            if (authCode != null)
             {
-                MessageBox.Show("Авторизация успешна! Код: " + authCode);
+                //APIYandex? yandexApi = new APIYandex();
+                //string authCode = await yandexApi.GetAuthCodeAsync();
 
-                string token = await yandexApi.GetOAuthToken(authCode);
-                MessageBox.Show("Токен получен: " + token);
+                //    if (authCode != null)
+                //    {
+                //        MessageBox.Show("Авторизация успешна! Код: " + authCode);
+
+                //        string token = await yandexApi.GetOAuthToken(authCode);
+                //        MessageBox.Show("Токен получен: " + token);
 
 
-                await yandexApi.CreateFolderAsync(token, "___for_planner___");
+                //        await yandexApi.CreateFolderAsync(token, "___for_planner___");
+                //        for (int i = 0; i < 4; i++)
+                //        {
+                //            string file = $"{i}.json";
+                //            if (System.IO.File.Exists(localFilePath + file))
+                //            {
+                //                MessageBox.Show("Локальный файл найден: " + localFilePath + file);
+                //                await yandexApi.UploadFileAsync(token, localFilePath + file, remoteFilePath + file);
+
+                //            }
+                //            else
+                //            {
+                //                MessageBox.Show("Локальный файл не найден: " + localFilePath + file);
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        MessageBox.Show("Ошибка авторизации.");
+                //    }
+            }
+
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
+
+        private async void button3_Click(object sender, EventArgs e)
+        {
+            this.Enabled = false;
+            //APIYandex? yandexApi = new APIYandex();
+            APIYandex.authCode = await APIYandex.GetAuthCodeAsync();
+
+            if (APIYandex.authCode != null)
+            {
+                MessageBox.Show("Авторизация успешна! Код: " + APIYandex.authCode);
+
+                APIYandex.token = await APIYandex.GetOAuthToken();
+                MessageBox.Show("Токен получен: " + APIYandex.token);
+
+
+                await APIYandex.CreateFolderAsync("___for_planner___");
                 for (int i = 0; i < 4; i++)
                 {
                     string file = $"{i}.json";
                     if (System.IO.File.Exists(localFilePath + file))
                     {
                         MessageBox.Show("Локальный файл найден: " + localFilePath + file);
-                        await yandexApi.UploadFileAsync(token, localFilePath + file, remoteFilePath + file);
+                        await APIYandex.UploadFileAsync(localFilePath + file, remoteFilePath + file);
 
                     }
                     else
@@ -79,11 +132,31 @@ namespace wfaToDo
                         MessageBox.Show("Локальный файл не найден: " + localFilePath + file);
                     }
                 }
+                // Получаем имя пользователя
+                string userName = await APIYandex.GetUserNameAsync();
+                if (userName != null)
+                {
+                    this.name = userName;
+                    MessageBox.Show("Имя пользователя: " + userName);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось получить имя пользователя.");
+                }
+                this.DialogResult = DialogResult.OK;
             }
             else
             {
                 MessageBox.Show("Ошибка авторизации.");
+                this.DialogResult = DialogResult.Cancel;
             }
+
+            this.Close();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

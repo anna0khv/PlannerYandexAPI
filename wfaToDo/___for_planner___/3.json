@@ -1,0 +1,51 @@
+[
+  {
+    "ID": 1,
+    "rang": 3,
+    "status": true,
+    "data": "3.01.2000",
+    "task": "Ничего не делать"
+  },
+  {
+    "ID": 2,
+    "rang": 3,
+    "status": false,
+    "data": "",
+    "task": ""
+  },
+  {
+    "ID": 3,
+    "rang": 3,
+    "status": false,
+    "data": "",
+    "task": ""
+  },
+  {
+    "ID": 4,
+    "rang": 3,
+    "status": false,
+    "data": "2025-01-21",
+    "task": "Новая задача"
+  },
+  {
+    "ID": 5,
+    "rang": 3,
+    "status": false,
+    "data": "2025-01-21",
+    "task": "Новая задача"
+  },
+  {
+    "ID": 6,
+    "rang": 3,
+    "status": false,
+    "data": "2025-01-21",
+    "task": "Новая задача"
+  },
+  {
+    "ID": 7,
+    "rang": 3,
+    "status": false,
+    "data": "2025-01-21",
+    "task": "Новая задача"
+  }
+]

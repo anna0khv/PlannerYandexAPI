@@ -39,3 +39,5 @@ D:\school\5sem\mobile\individual\PlannerYandexAPI\wfaToDo\obj\Debug\net9.0-windo
 D:\school\5sem\mobile\individual\PlannerYandexAPI\wfaToDo\obj\Debug\net9.0-windows\wfaToDo.pdb
 D:\school\5sem\mobile\individual\PlannerYandexAPI\wfaToDo\obj\Debug\net9.0-windows\wfaToDo.genruntimeconfig.cache
 D:\school\5sem\mobile\individual\PlannerYandexAPI\wfaToDo\obj\Debug\net9.0-windows\ref\wfaToDo.dll
+D:\school\5sem\mobile\individual\PlannerYandexAPI\wfaToDo\obj\Debug\net9.0-windows\wfaToDo.Closing.resources
+D:\school\5sem\mobile\individual\PlannerYandexAPI\wfaToDo\obj\Debug\net9.0-windows\wfaToDo.Properties.Resources.resources
