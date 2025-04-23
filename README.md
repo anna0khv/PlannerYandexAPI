@@ -1,2 +1,19 @@
 # PlannerYandexAPI
-Student project: a to-do list based on the principle {important&amp;urgent, important, urgent, other} with synchronization via YandexDisk.
+Student project: a to-do list based on the principle {important&urgent, important, urgent, other} with synchronization via YandexDisk.
+
+Планнер, основанный на матрице Эйзенхауэра - инструменте таймменеджмента, позволяющем эффективно сортировать и делегировать задачи в зависимости от их срочности и важности.
+Приложение позволяет работать с собственными задачами и сохранять их на свое хранилище в Яндекс.Диск для синхронизации между разными устройствами.
+
+Задачи хранятся в файлах .json, что позволяет оставаться уверенным в сохранности своих данных: при любом исходе они сохранятся у вас в читаемом формате.
+
+Пример работы:
+
+![image](https://github.com/user-attachments/assets/2eee183e-fd03-4e79-85b8-69907f1dbd32)
+
+![image](https://github.com/user-attachments/assets/35d1ee45-647b-4e31-a1ba-0082a4c284c1)
+
+![image](https://github.com/user-attachments/assets/1736029d-354b-4690-97d4-f620b13f2b8c)
+
+Перетаскивание задач между окнами осуществляется по двойному клику и последующему перетаскиванию задачи.
+
+При выбранном чекбоксе "Синхронизация" данные будут автоматически отправляться в фоновом режиме на диск каждые пять минут.
